@@ -122,6 +122,13 @@ func validate(jsonFile string) error {
 					return nil
 				}
 			}
+		} else {
+			//no schema found
+			if *requireSchema {
+				return errors.New(fmt.Sprintf("no schema reference found in %s and requireSchema is set", jsonFile))
+			} else {
+				return nil
+			}
 		}
 	}
 

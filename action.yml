@@ -16,4 +16,4 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - -dir=/github/workspace
+    - -dir=/github/workspace/
