@@ -16,7 +16,7 @@ ARG VERSION
 ARG REVISION
 
 COPY --from=build-env /go/bin/schema-validator /
-CMD ["/schema-validator"]
+ENTRYPOINT ["/schema-validator"]
 
 LABEL org.opencontainers.image.created=$DATE
 LABEL org.opencontainers.image.url="https://github.com/earthrise-media/trace-schemas"
