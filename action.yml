@@ -1,0 +1,23 @@
+# action.yml
+name: 'JSON Schema Validator'
+description: 'Validates JSON files against schemas'
+author: tingold
+inputs:
+  dir:  # id of input
+    description: 'directory to run in'
+    required: true
+    default: '/'
+  failFast:
+    description: 'whether to continue after first failure'
+    default: false
+  requireSchema:
+    description: 'whether to fail JSON files without schemas'
+    default: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - -dir=${{ inputs.dir }}
+    - -failfast=${{ inputs.failfast }}
+    - -requireschema=${{ inputs.requireSchema }}
