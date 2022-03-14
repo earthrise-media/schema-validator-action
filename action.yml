@@ -6,12 +6,14 @@ inputs:
   dir:  # id of input
     description: 'directory to run in'
     required: true
-    default: '/'
+    default: '.'
   failFast:
     description: 'whether to continue after first failure'
+    required: false
     default: false
   requireSchema:
     description: 'whether to fail JSON files without schemas'
+    required: false
     default: false
 
 runs:
@@ -19,5 +21,3 @@ runs:
   image: 'Dockerfile'
   args:
     - -dir=${{ inputs.dir }}
-    - -failfast=${{ inputs.failfast }}
-    - -requireschema=${{ inputs.requireSchema }}
