@@ -74,7 +74,7 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 		return nil
 	}
 	if strings.HasSuffix(entry, ".json") || strings.HasSuffix(entry, ".geojson") {
-
+		fmt.Println(fmt.Sprintf("Validating %s", entry))
 		err = validate(entry)
 		schemaErrors[entry] = err
 
