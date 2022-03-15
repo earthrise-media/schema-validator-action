@@ -5,7 +5,7 @@ Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
 
 ## Usage 
 
-The `schema-validator` tool accepts the following flags:
+The `schema-validator` looks for the following environment variables
 
 - `dir` the directory to walk, all subdirectories are also inspected
 - `schema` (optional) the location of a schema to use for validation(can be file path or http/s) 

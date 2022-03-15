@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
@@ -19,11 +18,6 @@ var failFast *bool
 var requireSchema *bool
 var cachedSchemas = make(map[string]*jsonschema.Schema)
 var schemaErrors = make(map[string]error)
-
-func usage() {
-
-	flag.PrintDefaults()
-}
 
 const (
 	DIR                   = "GITHUB_WORKSPACE"
@@ -128,6 +122,9 @@ func validate(jsonFile string) error {
 			declaredSchema := fmt.Sprintf("%v", val)
 			if declaredSchema != "" {
 				currentSchema, err = loadSchema(declaredSchema)
+				if err != nil {
+					return err
+				}
 			} else {
 				//schema field found but empty
 				if viper.GetBool(REQUIRE_SCHEMAS) {
