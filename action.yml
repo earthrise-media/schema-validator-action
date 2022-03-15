@@ -2,18 +2,8 @@
 name: 'JSON Schema Validator'
 description: 'Validates JSON files against schemas'
 author: tingold
-inputs:
-  failFast:
-    description: 'whether to continue after first failure'
-    required: false
-    default: false
-  requireSchema:
-    description: 'whether to fail JSON files without schemas'
-    required: false
-    default: false
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - -dir=/github/workspace/
+

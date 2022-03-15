@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
+	"github.com/spf13/viper"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -20,38 +21,48 @@ var cachedSchemas = make(map[string]*jsonschema.Schema)
 var schemaErrors = make(map[string]error)
 
 func usage() {
+
 	flag.PrintDefaults()
 }
 
+const (
+	DIR                   = "GITHUB_WORKSPACE"
+	FORCE_SCHEMA_LOCATION = "FORCE_SCHEMA_LOCATION"
+	FAIL_FAST             = "FAIL_FAST"
+	REQUIRE_SCHEMAS       = "REQUIRE_SCHEMAS"
+)
+
 func main() {
 
-	dir := flag.String("dir", "/", "directory to search for json files")
-	// draft := flag.Int("draft", 2020, "which schema draft version to use")
-	schema := flag.String("schema", "", "the schema to apply, if empty will use schema references in json docs")
-	failFast = flag.Bool("failFast", false, "setting this to true will cause the validator to exit on the first failure")
-	requireSchema = flag.Bool("requireSchema", false, "setting this will cause json without declared schemas to be considered validation failures")
+	viper.SetDefault(DIR, "")
+	viper.SetDefault(FORCE_SCHEMA_LOCATION, "")
+	viper.SetDefault(FAIL_FAST, false)
+	viper.SetDefault(REQUIRE_SCHEMAS, false)
 
-	flag.Usage = usage
-	flag.Parse()
-	//if len(flag.Args()) == 0 {
-	//	usage()
-	//	os.Exit(1)
-	//}
+	viper.AutomaticEnv()
+
 	var err error
 
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft2020
 
-	if schema != nil && *schema != "" {
-		compiledSchema, err = compiler.Compile(*schema)
+	if viper.GetString(FORCE_SCHEMA_LOCATION) != "" {
+		compiledSchema, err = compiler.Compile(viper.GetString(FORCE_SCHEMA_LOCATION))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Unabled to compile provided schema: %#v\n", err)
 			os.Exit(1)
 		}
 	}
-
-	err = filepath.WalkDir(*dir, walkValidate)
-	if err != nil && *failFast {
+	dir := viper.GetString(DIR)
+	if dir == "" {
+		dir, err = os.Getwd()
+		if err != nil {
+			fmt.Println(fmt.Sprintf("unable to find current working dir and no dir provided: %s", err.Error()))
+			os.Exit(1)
+		}
+	}
+	err = filepath.WalkDir(dir, walkValidate)
+	if err != nil && viper.GetBool(FAIL_FAST) {
 		fmt.Println(fmt.Sprintf("Validation failed fast, some JSON files were potentially skipped!"))
 	}
 
@@ -83,7 +94,7 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 
 		if err != nil {
 			fmt.Println(err.Error())
-			if *failFast {
+			if viper.GetBool(FAIL_FAST) {
 				return err
 			}
 		}
@@ -119,7 +130,7 @@ func validate(jsonFile string) error {
 				currentSchema, err = loadSchema(declaredSchema)
 			} else {
 				//schema field found but empty
-				if *requireSchema {
+				if viper.GetBool(REQUIRE_SCHEMAS) {
 					return errors.New(fmt.Sprintf("empty schema declaration found in %s and requireSchema is set", jsonFile))
 				} else {
 					return nil
@@ -127,7 +138,7 @@ func validate(jsonFile string) error {
 			}
 		} else {
 			//no schema found
-			if *requireSchema {
+			if viper.GetBool(REQUIRE_SCHEMAS) {
 				return errors.New(fmt.Sprintf("no schema reference found in %s and requireSchema is set", jsonFile))
 			} else {
 				return nil
