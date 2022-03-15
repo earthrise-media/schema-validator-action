@@ -14,10 +14,9 @@ import (
 )
 
 var compiledSchema *jsonschema.Schema
-var failFast *bool
-var requireSchema *bool
 var cachedSchemas = make(map[string]*jsonschema.Schema)
 var schemaErrors = make(map[string]error)
+var hadError bool
 
 const (
 	DIR                   = "GITHUB_WORKSPACE"
@@ -70,6 +69,9 @@ func main() {
 			fmt.Println(fmt.Sprintf("Error detail: %s", schemaError.Error()))
 		}
 	}
+	if hadError {
+		os.Exit(1)
+	}
 
 }
 
@@ -86,6 +88,7 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 		schemaErrors[entry] = err
 
 		if err != nil {
+			hadError = true
 			if viper.GetBool(FAIL_FAST) {
 				return err
 			}
