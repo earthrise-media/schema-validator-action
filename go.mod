@@ -1,4 +1,4 @@
-module github.com/earthrise-media/trace-schemas
+module github.com/earthrise-media/schema-validator-action
 
 go 1.17
 
