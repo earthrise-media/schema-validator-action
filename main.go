@@ -76,7 +76,6 @@ func main() {
 func walkValidate(entry string, dir fs.DirEntry, err error) error {
 
 	if dir != nil {
-		fmt.Println(fmt.Sprintf("Dir: %s", dir.Name()))
 		if dir.IsDir() {
 			return nil
 		}
@@ -87,7 +86,6 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 		schemaErrors[entry] = err
 
 		if err != nil {
-			fmt.Println(err.Error())
 			if viper.GetBool(FAIL_FAST) {
 				return err
 			}
