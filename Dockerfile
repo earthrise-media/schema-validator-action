@@ -19,11 +19,11 @@ COPY --from=build-env /go/bin/schema-validator /
 ENTRYPOINT ["/schema-validator"]
 
 LABEL org.opencontainers.image.created=$DATE
-LABEL org.opencontainers.image.url="https://github.com/earthrise-media/trace-schemas"
-LABEL org.opencontainers.image.source="https://github.com/earthrise-media/trace-schemas"
+LABEL org.opencontainers.image.url="https://github.com/earthrise-media/schema-validator-action"
+LABEL org.opencontainers.image.source="https://github.com/earthrise-media/schema-validator-action"
 LABEL org.opencontainers.image.version=$VERSION
 LABEL org.opencontainers.image.revision=$REVISION
 LABEL org.opencontainers.image.vendor="Earthrise Media"
-LABEL org.opencontainers.image.title="schema-validator"
+LABEL org.opencontainers.image.title="schema-validator-action"
 LABEL org.opencontainers.image.description="This is a json schema validator"
 LABEL org.opencontainers.image.authors="tingold"

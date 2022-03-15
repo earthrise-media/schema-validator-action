@@ -7,18 +7,25 @@ Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
 
 The `schema-validator` looks for the following environment variables
 
-- `dir` the directory to walk, all subdirectories are also inspected
-- `schema` (optional) the location of a schema to use for validation(can be file path or http/s) 
-- `failFast` (default `false`) if set the tool will exit on first error 
-- `requireSchema` (default `false`) setting this will cause JSON files without declared schemas to be considered validation failures
+- `GITHUB_WORKSPACE` the directory to walk, all subdirectories are also inspected. 
+When run as an action github will populate this value with the root of the repository  
+- `FORCE_SCHEMA_LOCATION` (optional) the location of a schema to use for validation(can be file path or http/s) 
+- `FAIL_FAST` (default `false`) if set the tool will exit on first error 
+- `REQUIRE_SCHEMAS` (default `false`) setting this will cause JSON files without declared schemas to be considered validation failures
 
 
 ### Examples 
 
 Make sure every JSON file on your machine is GeoJSON, fail if one isn't:
 
-`$ schema-validator -failfast=true -schema=https://json.schemastore.org/geojson.json -dir=/`
+`$ env FAIL_FAST=true REQUIRE_SCHEMAS=https://json.schemastore.org/geojson.json GITHUB_WORKSPACE=/`schema-validator`
 
+Inside a GitHub workflow:
+```
+steps:
+   - uses: actions/checkout@v2
+   - uses: earthrise-media/schema-validator-action@main
+```
 
 ## Behavior
 
@@ -26,6 +33,6 @@ Files are validated only if they end in `.json` or `.geojson`
 Validation includes:
 1. Must be valid JSON syntax (i.e. braces and quotes must be closed etc.)
 2. Schema validation:
-   - If a schema is provided to the tool (using the `-schema` flag) it will override any schema declared in the JSON file
+   - If a schema is provided to the tool (using the `FORCE_SCHEMA_LOCATION` env var) it will override any schema declared in the JSON file
    - If no schema is provided the file will be validated using any schema declared in a top level `$schema` field
-   - If no schema is found either way 
+   - If no schema is found in the file, it will be considered valid unless the `REQUIRE_SCHEMAS` env var is set, in which case it will be considered a failure
