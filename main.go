@@ -70,8 +70,11 @@ func main() {
 
 func walkValidate(entry string, dir fs.DirEntry, err error) error {
 
-	if dir.IsDir() {
-		return nil
+	if dir != nil {
+		fmt.Println(fmt.Sprintf("Dir: %s", dir.Name()))
+		if dir.IsDir() {
+			return nil
+		}
 	}
 	if strings.HasSuffix(entry, ".json") || strings.HasSuffix(entry, ".geojson") {
 		fmt.Println(fmt.Sprintf("Validating %s", entry))
