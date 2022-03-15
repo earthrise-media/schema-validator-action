@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
@@ -19,18 +18,18 @@ var schemaErrors = make(map[string]error)
 var hadError bool
 
 const (
-	DIR                   = "GITHUB_WORKSPACE"
-	FORCE_SCHEMA_LOCATION = "FORCE_SCHEMA_LOCATION"
-	FAIL_FAST             = "FAIL_FAST"
-	REQUIRE_SCHEMAS       = "REQUIRE_SCHEMAS"
+	DIR                 = "GITHUB_WORKSPACE"
+	ForceSchemaLocation = "FORCE_SCHEMA_LOCATION"
+	FailFast            = "FAIL_FAST"
+	RequireSchemas      = "REQUIRE_SCHEMAS"
 )
 
 func main() {
 
 	viper.SetDefault(DIR, "")
-	viper.SetDefault(FORCE_SCHEMA_LOCATION, "")
-	viper.SetDefault(FAIL_FAST, false)
-	viper.SetDefault(REQUIRE_SCHEMAS, false)
+	viper.SetDefault(ForceSchemaLocation, "")
+	viper.SetDefault(FailFast, false)
+	viper.SetDefault(RequireSchemas, false)
 
 	viper.AutomaticEnv()
 
@@ -39,8 +38,8 @@ func main() {
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft2020
 
-	if viper.GetString(FORCE_SCHEMA_LOCATION) != "" {
-		compiledSchema, err = compiler.Compile(viper.GetString(FORCE_SCHEMA_LOCATION))
+	if viper.GetString(ForceSchemaLocation) != "" {
+		compiledSchema, err = compiler.Compile(viper.GetString(ForceSchemaLocation))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Unabled to compile provided schema: %#v\n", err)
 			os.Exit(1)
@@ -55,11 +54,11 @@ func main() {
 		}
 	}
 	err = filepath.WalkDir(dir, walkValidate)
-	if err != nil && viper.GetBool(FAIL_FAST) {
+	if err != nil && viper.GetBool(FailFast) {
 		fmt.Println(fmt.Sprintf("Validation failed fast, some JSON files were potentially skipped!"))
 	}
 
-	for k, _ := range schemaErrors {
+	for k := range schemaErrors {
 		schemaError := schemaErrors[k]
 		if schemaError == nil {
 			fmt.Println(fmt.Sprintf("%s \U00002705", k))
@@ -89,7 +88,7 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 
 		if err != nil {
 			hadError = true
-			if viper.GetBool(FAIL_FAST) {
+			if viper.GetBool(FailFast) {
 				return err
 			}
 		}
@@ -102,14 +101,14 @@ func validate(jsonFile string) error {
 	file, err := os.Open(jsonFile)
 	defer file.Close()
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error opening file: %v\n", err))
+		return fmt.Errorf("Error opening file: %v\n", err)
 	}
 
 	var v map[string]interface{}
 	dec := json.NewDecoder(file)
 	dec.UseNumber()
 	if err := dec.Decode(&v); err != nil {
-		return errors.New(fmt.Sprintf("Syntax error: %v\n", err))
+		return fmt.Errorf("Syntax error: %v\n", err)
 	}
 	var currentSchema *jsonschema.Schema
 
@@ -128,19 +127,19 @@ func validate(jsonFile string) error {
 				}
 			} else {
 				//schema field found but empty
-				if viper.GetBool(REQUIRE_SCHEMAS) {
-					return errors.New(fmt.Sprintf("empty schema declaration found in %s and requireSchema is set", jsonFile))
-				} else {
-					return nil
+				if viper.GetBool(RequireSchemas) {
+					return fmt.Errorf("empty schema declaration found in %s and requireSchema is set", jsonFile)
 				}
+				return nil
+
 			}
 		} else {
 			//no schema found
-			if viper.GetBool(REQUIRE_SCHEMAS) {
-				return errors.New(fmt.Sprintf("no schema reference found in %s and requireSchema is set", jsonFile))
-			} else {
-				return nil
+			if viper.GetBool(RequireSchemas) {
+				return fmt.Errorf("no schema reference found in %s and requireSchema is set", jsonFile)
 			}
+			return nil
+
 		}
 	}
 
@@ -148,7 +147,7 @@ func validate(jsonFile string) error {
 	if ve, ok := err.(*jsonschema.ValidationError); ok {
 		out := ve.DetailedOutput()
 		b, _ := json.MarshalIndent(out, "", "  ")
-		return errors.New(string(b))
+		return fmt.Errorf(string(b))
 	}
 	return nil
 
@@ -164,7 +163,7 @@ func loadSchema(declaredSchema string) (*jsonschema.Schema, error) {
 	schema, err := jsonschema.Compile(declaredSchema)
 
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("unable to load declared schema: %v\n", err))
+		return nil, fmt.Errorf("unable to load declared schema: %v\n", err)
 	} else {
 		//cache it
 		cachedSchemas[declaredSchema] = schema

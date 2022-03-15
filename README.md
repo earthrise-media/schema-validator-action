@@ -1,4 +1,7 @@
 # JSON Schema Validator
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/earthrise-media/schema-validator-action)](https://goreportcard.com/report/github.com/earthrise-media/schema-validator-action)
+
 This is a utility (and Github action) that recursively walks a directory and validates all JSON files that it finds.
 Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
 
