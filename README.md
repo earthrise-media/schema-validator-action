@@ -4,7 +4,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action?ref=badge_shield)
 
 This is a utility (and Github action) that recursively walks a directory and validates all JSON files that it finds.
-Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
+Based on [this great validation library](https://github.com/santhosh-tekuri/jsonschema)
 
 
 ## Usage 
