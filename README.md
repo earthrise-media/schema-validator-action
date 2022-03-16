@@ -1,6 +1,7 @@
 # JSON Schema Validator
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/earthrise-media/schema-validator-action)](https://goreportcard.com/report/github.com/earthrise-media/schema-validator-action)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action?ref=badge_shield)
 
 This is a utility (and Github action) that recursively walks a directory and validates all JSON files that it finds.
 Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
@@ -39,3 +40,6 @@ Validation includes:
    - If a schema is provided to the tool (using the `FORCE_SCHEMA_LOCATION` env var) it will override any schema declared in the JSON file
    - If no schema is provided the file will be validated using any schema declared in a top level `$schema` field
    - If no schema is found in the file, it will be considered valid unless the `REQUIRE_SCHEMAS` env var is set, in which case it will be considered a failure
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action?ref=badge_large)
