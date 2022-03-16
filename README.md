@@ -9,7 +9,7 @@ Based on [this great validation library](https://github.com/santhosh-tekuri/json
 
 ## Usage 
 
-The `schema-validator` looks for the following environment variables
+The `schema-validator` looks for the following environment variables to control it's behavior:
 
 - `GITHUB_WORKSPACE` the directory to walk, all subdirectories are also inspected. 
 When run as an action github will populate this value with the root of the repository  
@@ -22,9 +22,9 @@ When run as an action github will populate this value with the root of the repos
 
 Make sure every JSON file on your machine is GeoJSON, fail if one isn't:
 
-`$ env FAIL_FAST=true REQUIRE_SCHEMAS=https://json.schemastore.org/geojson.json GITHUB_WORKSPACE=/`schema-validator`
+`$ env FAIL_FAST=true REQUIRE_SCHEMAS=https://json.schemastore.org/geojson.json GITHUB_WORKSPACE=/ schema-validator`
 
-Inside a GitHub workflow:
+Inside a GitHub workflow yaml file:
 ```
 steps:
    - uses: actions/checkout@v2
