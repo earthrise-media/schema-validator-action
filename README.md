@@ -1,16 +1,17 @@
 # JSON Schema Validator
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/earthrise-media/schema-validator-action)](https://goreportcard.com/report/github.com/earthrise-media/schema-validator-action)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action?ref=badge_shield)
 
 [![Known Vulnerabilities](https://snyk.io/test/github/earthrise-media/schema-validator-action/badge.svg)](https://snyk.io/test/github/earthrise-media/schema-validator-action)
 
 This is a utility (and Github action) that recursively walks a directory and validates all JSON files that it finds.
-Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
+Based on [this great validation library](https://github.com/santhosh-tekuri/jsonschema)
 
 
 ## Usage 
 
-The `schema-validator` looks for the following environment variables
+The `schema-validator` looks for the following environment variables to control it's behavior:
 
 - `GITHUB_WORKSPACE` the directory to walk, all subdirectories are also inspected. 
 When run as an action github will populate this value with the root of the repository  
@@ -23,9 +24,9 @@ When run as an action github will populate this value with the root of the repos
 
 Make sure every JSON file on your machine is GeoJSON, fail if one isn't:
 
-`$ env FAIL_FAST=true REQUIRE_SCHEMAS=https://json.schemastore.org/geojson.json GITHUB_WORKSPACE=/`schema-validator`
+`$ env FAIL_FAST=true REQUIRE_SCHEMAS=https://json.schemastore.org/geojson.json GITHUB_WORKSPACE=/ schema-validator`
 
-Inside a GitHub workflow:
+Inside a GitHub workflow yaml file:
 ```
 steps:
    - uses: actions/checkout@v2
@@ -41,3 +42,6 @@ Validation includes:
    - If a schema is provided to the tool (using the `FORCE_SCHEMA_LOCATION` env var) it will override any schema declared in the JSON file
    - If no schema is provided the file will be validated using any schema declared in a top level `$schema` field
    - If no schema is found in the file, it will be considered valid unless the `REQUIRE_SCHEMAS` env var is set, in which case it will be considered a failure
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fearthrise-media%2Fschema-validator-action?ref=badge_large)
