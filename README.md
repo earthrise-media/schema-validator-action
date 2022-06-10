@@ -2,6 +2,8 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/earthrise-media/schema-validator-action)](https://goreportcard.com/report/github.com/earthrise-media/schema-validator-action)
 
+[![Known Vulnerabilities](https://snyk.io/test/github/earthrise-media/schema-validator-action/badge.svg)](https://snyk.io/test/github/earthrise-media/schema-validator-action)
+
 This is a utility (and Github action) that recursively walks a directory and validates all JSON files that it finds.
 Based on [this great validation library](github.com/santhosh-tekuri/jsonschema)
 
@@ -12,9 +14,9 @@ The `schema-validator` looks for the following environment variables
 
 - `GITHUB_WORKSPACE` the directory to walk, all subdirectories are also inspected. 
 When run as an action github will populate this value with the root of the repository  
-- `FORCE_SCHEMA_LOCATION` (optional) the location of a schema to use for validation(can be file path or http/s) 
+- `FORCE_SCHEMA_LOCATION` (required) the location of a schema to use for validation(can be file path or http/s) 
 - `FAIL_FAST` (default `false`) if set the tool will exit on first error 
-- `REQUIRE_SCHEMAS` (default `false`) setting this will cause JSON files without declared schemas to be considered validation failures
+
 
 
 ### Examples 

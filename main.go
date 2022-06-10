@@ -41,9 +41,11 @@ func main() {
 	if viper.GetString(ForceSchemaLocation) != "" {
 		compiledSchema, err = compiler.Compile(viper.GetString(ForceSchemaLocation))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unabled to compile provided schema: %#v\n", err)
+			fmt.Fprintf(os.Stderr, "Unable to compile provided schema: %#v\n", err)
 			os.Exit(1)
 		}
+	} else {
+		fmt.Fprintf(os.Stderr, "%s is a required ENV", ForceSchemaLocation)
 	}
 	dir := viper.GetString(DIR)
 	if dir == "" {
@@ -81,7 +83,7 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 			return nil
 		}
 	}
-	if strings.HasSuffix(entry, ".json") || strings.HasSuffix(entry, ".geojson") {
+	if strings.HasSuffix(entry, "json") {
 		fmt.Println(fmt.Sprintf("Validating %s", entry))
 		err = validate(entry)
 		schemaErrors[entry] = err
@@ -104,70 +106,20 @@ func validate(jsonFile string) error {
 		return fmt.Errorf("Error opening file: %v\n", err)
 	}
 
-	var v map[string]interface{}
+	//var v map[string]interface{}
+	var v interface{}
 	dec := json.NewDecoder(file)
 	dec.UseNumber()
 	if err := dec.Decode(&v); err != nil {
 		return fmt.Errorf("Syntax error: %v\n", err)
 	}
-	var currentSchema *jsonschema.Schema
 
-	// this means we are forcing a schema, not looking for a declared one
-	if compiledSchema != nil {
-		currentSchema = compiledSchema
-	} else {
-		//look for schema declaration in the file
-		if val, ok := v["$schema"]; ok {
-			//found schema
-			declaredSchema := fmt.Sprintf("%v", val)
-			if declaredSchema != "" {
-				currentSchema, err = loadSchema(declaredSchema)
-				if err != nil {
-					return err
-				}
-			} else {
-				//schema field found but empty
-				if viper.GetBool(RequireSchemas) {
-					return fmt.Errorf("empty schema declaration found in %s and requireSchema is set", jsonFile)
-				}
-				return nil
-
-			}
-		} else {
-			//no schema found
-			if viper.GetBool(RequireSchemas) {
-				return fmt.Errorf("no schema reference found in %s and requireSchema is set", jsonFile)
-			}
-			return nil
-
-		}
-	}
-
-	err = currentSchema.Validate(v)
+	err = compiledSchema.Validate(v)
 	if ve, ok := err.(*jsonschema.ValidationError); ok {
 		out := ve.DetailedOutput()
 		b, _ := json.MarshalIndent(out, "", "  ")
 		return fmt.Errorf(string(b))
 	}
 	return nil
-
-}
-
-func loadSchema(declaredSchema string) (*jsonschema.Schema, error) {
-
-	if schema, ok := cachedSchemas[declaredSchema]; ok {
-		//found it in cache
-		return schema, nil
-	}
-
-	schema, err := jsonschema.Compile(declaredSchema)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to load declared schema: %v\n", err)
-	} else {
-		//cache it
-		cachedSchemas[declaredSchema] = schema
-		return schema, err
-	}
 
 }
