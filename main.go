@@ -13,7 +13,6 @@ import (
 )
 
 var compiledSchema *jsonschema.Schema
-var cachedSchemas = make(map[string]*jsonschema.Schema)
 var schemaErrors = make(map[string]error)
 var hadError bool
 
@@ -51,23 +50,23 @@ func main() {
 	if dir == "" {
 		dir, err = os.Getwd()
 		if err != nil {
-			fmt.Println(fmt.Sprintf("unable to find current working dir and no dir provided: %s", err.Error()))
+			fmt.Printf("unable to find current working dir and no dir provided: %s \n", err.Error())
 			os.Exit(1)
 		}
 	}
 	err = filepath.WalkDir(dir, walkValidate)
 	if err != nil && viper.GetBool(FailFast) {
-		fmt.Println(fmt.Sprintf("Validation failed fast, some JSON files were potentially skipped!"))
+		fmt.Printf("Validation failed fast, some JSON files were potentially skipped! \n ")
 	}
 
 	for k := range schemaErrors {
 		schemaError := schemaErrors[k]
 		if schemaError == nil {
-			fmt.Println(fmt.Sprintf("%s \U00002705", k))
+			fmt.Printf("%s \U00002705 \n ", k)
 
 		} else {
-			fmt.Println(fmt.Sprintf("%s \U0000274C", k))
-			fmt.Println(fmt.Sprintf("Error detail: %s", schemaError.Error()))
+			fmt.Printf("%s \U0000274C \n", k)
+			fmt.Printf("Error detail: %s \n ", schemaError.Error())
 		}
 	}
 	if hadError {
@@ -78,22 +77,26 @@ func main() {
 
 func walkValidate(entry string, dir fs.DirEntry, err error) error {
 
+	if err != nil {
+		return err
+	}
+
 	if dir != nil {
 		if dir.IsDir() {
 			return nil
 		}
 	}
-	if strings.HasSuffix(entry, "json") {
-		fmt.Println(fmt.Sprintf("Validating %s", entry))
-		err = validate(entry)
-		schemaErrors[entry] = err
 
+	if strings.HasSuffix(entry, "json") {
+		fmt.Printf("Validating %s \n", entry)
+		err = validate(entry)
 		if err != nil {
 			hadError = true
 			if viper.GetBool(FailFast) {
 				return err
 			}
 		}
+		schemaErrors[entry] = err
 	}
 	return nil
 }
@@ -101,10 +104,10 @@ func walkValidate(entry string, dir fs.DirEntry, err error) error {
 func validate(jsonFile string) error {
 
 	file, err := os.Open(jsonFile)
-	defer file.Close()
 	if err != nil {
 		return fmt.Errorf("Error opening file: %v\n", err)
 	}
+	defer file.Close()
 
 	//var v map[string]interface{}
 	var v interface{}
