@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -17,7 +18,8 @@ var schemaErrors = make(map[string]error)
 var hadError bool
 
 const (
-	DIR                 = "GITHUB_WORKSPACE"
+	BASEDIR             = "GITHUB_WORKSPACE"
+	SUBDIR              = "DIR"
 	ForceSchemaLocation = "FORCE_SCHEMA_LOCATION"
 	FailFast            = "FAIL_FAST"
 	RequireSchemas      = "REQUIRE_SCHEMAS"
@@ -25,7 +27,8 @@ const (
 
 func main() {
 
-	viper.SetDefault(DIR, "")
+	viper.SetDefault(BASEDIR, "")
+	viper.SetDefault(SUBDIR, "")
 	viper.SetDefault(ForceSchemaLocation, "")
 	viper.SetDefault(FailFast, false)
 	viper.SetDefault(RequireSchemas, false)
@@ -46,7 +49,7 @@ func main() {
 	} else {
 		fmt.Fprintf(os.Stderr, "%s is a required ENV", ForceSchemaLocation)
 	}
-	dir := viper.GetString(DIR)
+	dir := path.Join(viper.GetString(BASEDIR), viper.GetString(SUBDIR))
 	if dir == "" {
 		dir, err = os.Getwd()
 		if err != nil {
